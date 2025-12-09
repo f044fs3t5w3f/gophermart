@@ -1,5 +1,5 @@
 CREATE TABLE users(
-    id integer GENERATED ALWAYS AS IDENTITY NOT NULL,
+    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,
     login varchar(50),
     password_hash varchar(255),
     PRIMARY KEY(id)

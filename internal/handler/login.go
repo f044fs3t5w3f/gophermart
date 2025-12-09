@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/f044fs3t5w3f/gophermart/internal/auth"
 	"github.com/f044fs3t5w3f/gophermart/internal/service"
 )
 
@@ -33,7 +34,7 @@ func login(s *service.Service) http.HandlerFunc {
 			http.Error(w, "Incorrect login/password", http.StatusUnauthorized)
 		case nil:
 			http.SetCookie(w, &http.Cookie{
-				Name:  "token",
+				Name:  auth.TokenCookieName,
 				Value: token,
 				Path:  "/",
 			})

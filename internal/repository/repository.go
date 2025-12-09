@@ -13,4 +13,10 @@ type Repository interface {
 	DoesUserExist(context.Context, string) (bool, error)
 
 	CreateSession(ctx context.Context, session *models.Session) error
+	GetUserByToken(ctx context.Context, token string) (*models.User, error)
+
+	GetOrderByNumber(ctx context.Context, number string) (*models.Order, error)
+	CreateOrder(ctx context.Context, order *models.Order) error
+
+	GetOrdersByUserId(ctx context.Context, userId int64) ([]*models.Order, error)
 }

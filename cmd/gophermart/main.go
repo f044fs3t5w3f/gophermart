@@ -17,6 +17,8 @@ func main() {
 	config := getConfig()
 	db, err := sql.Open("pgx", config.databaseURI)
 
+	logger.Initialize("info")
+
 	if err != nil {
 		logger.Log.Fatal("couldn't open db connection", zap.Error(err))
 	}
@@ -29,7 +31,7 @@ func main() {
 
 	repository := dbRepo.NewDBRepository(db)
 	service := service.NewService(repository)
-	router := handler.GetRouter(service)
+	router := handler.GetRouter(service, repository)
 	logger.Log.Info("Server has been started", zap.String("addr", config.runAddress))
 	err = http.ListenAndServe(config.runAddress, router)
 	if err != nil {
