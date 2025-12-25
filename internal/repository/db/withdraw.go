@@ -12,11 +12,14 @@ func (d *dbRepository) CreateWithdraw(ctx context.Context, withdraw *models.With
 	tx, err := d.db.BeginTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelSerializable,
 	})
+	if err != nil {
+		return err
+	}
 	defer tx.Rollback()
 
 	sum := int64(withdraw.Sum * multiplier)
 
-	row := d.db.QueryRowContext(ctx, `
+	row := tx.QueryRowContext(ctx, `
 	SELECT accruals - withdraws as balance 
 	FROM users
 	WHERE id = $1

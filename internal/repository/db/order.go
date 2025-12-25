@@ -52,6 +52,14 @@ func (d *dbRepository) GetOrdersByUserId(ctx context.Context, userId int64) ([]*
 	if err != nil {
 		return nil, err
 	}
+	err = rows.Err()
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return make([]*models.Order, 0), nil
+		} else {
+			return nil, err
+		}
+	}
 	orders := []*models.Order{}
 	for rows.Next() {
 		rows.Scan()
@@ -75,6 +83,14 @@ func (d *dbRepository) ListOrdersForUpdate(ctx context.Context) ([]*models.Order
 	ORDER BY id DESC`, models.OrderStatusNew, models.OrderStatusProcessing)
 	if err != nil {
 		return nil, err
+	}
+	err = rows.Err()
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return make([]*models.Order, 0), nil
+		} else {
+			return nil, err
+		}
 	}
 	orders := []*models.Order{}
 	for rows.Next() {

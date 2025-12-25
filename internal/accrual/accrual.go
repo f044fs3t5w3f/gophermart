@@ -92,13 +92,13 @@ func (p *AccuralService) AddToFetchList(order *models.Order) {
 			case client.StatusRegistered:
 				// do nothing
 			case client.StatusProcessing:
-				err := p.repository.UpdateOrderStatus(p.ctx, order.Id, models.OrderStatusProcessing)
+				err := p.repository.UpdateOrderStatus(p.ctx, order.ID, models.OrderStatusProcessing)
 				if err != nil {
 					p.log.Error("failed to update order status", zap.String("orderId", order.Number))
 				}
 			case client.StatusProcessed:
 				status := models.OrderStatusProcessed
-				err := p.repository.UpdateOrderStatusAndAccrual(p.ctx, order.Id, status, accrual.Accrual)
+				err := p.repository.UpdateOrderStatusAndAccrual(p.ctx, order.ID, status, accrual.Accrual)
 				if err != nil {
 					p.log.Error("failed to update order status and accrual", zap.String("orderId", order.Number))
 				} else {
@@ -107,7 +107,7 @@ func (p *AccuralService) AddToFetchList(order *models.Order) {
 
 			case client.StatusInvalid:
 				status := models.OrderStatusInvalid
-				err := p.repository.UpdateOrderStatus(p.ctx, order.Id, status)
+				err := p.repository.UpdateOrderStatus(p.ctx, order.ID, status)
 				if err != nil {
 					logger.Log.Error("failed to update order status", zap.String("orderId", order.Number))
 				} else {
