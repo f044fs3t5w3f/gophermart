@@ -35,7 +35,7 @@ func (s *Service) Login(ctx context.Context, login, password string) (string, er
 	}
 
 	session := &models.Session{
-		UserId: user.Id,
+		UserId: user.ID,
 		Token:  token,
 	}
 	err = s.repo.CreateSession(ctx, session)

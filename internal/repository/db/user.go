@@ -18,7 +18,7 @@ func (d *dbRepository) CreateUser(ctx context.Context, user *models.User) error 
 	if err != nil {
 		return err
 	}
-	err = result.Scan(&user.Id)
+	err = result.Scan(&user.ID)
 	return err
 }
 
@@ -40,7 +40,7 @@ func (d *dbRepository) GetUserByLogin(ctx context.Context, login string) (*model
 		return nil, err
 	}
 	user := &models.User{}
-	err = row.Scan(&user.Id, &user.Login, &user.PasswordHash)
+	err = row.Scan(&user.ID, &user.Login, &user.PasswordHash)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -59,7 +59,7 @@ func (d *dbRepository) GetUserByToken(ctx context.Context, token string) (*model
 		return nil, err
 	}
 	user := &models.User{}
-	err = row.Scan(&user.Id, &user.Login)
+	err = row.Scan(&user.ID, &user.Login)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}

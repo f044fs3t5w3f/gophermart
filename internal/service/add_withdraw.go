@@ -22,7 +22,7 @@ func (s *Service) AddWithdraw(ctx context.Context, order string, sum float64) er
 	withdraw := &models.Withdraw{
 		Order:  order,
 		Sum:    sum,
-		UserId: user.Id,
+		UserId: user.ID,
 	}
 	return s.repo.CreateWithdraw(ctx, withdraw)
 }

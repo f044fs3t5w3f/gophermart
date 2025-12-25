@@ -25,7 +25,7 @@ func (s *Service) AddOrder(ctx context.Context, token, orderNumber string) (bool
 		return false, ErrInternalError
 	}
 	if existedOrder != nil {
-		if existedOrder.UserId != user.Id {
+		if existedOrder.UserID != user.ID {
 			return false, ErrOrderAlreadyExists
 		}
 		return false, nil
@@ -33,7 +33,7 @@ func (s *Service) AddOrder(ctx context.Context, token, orderNumber string) (bool
 
 	order := &models.Order{
 		Number: orderNumber,
-		UserId: user.Id,
+		UserID: user.ID,
 		Status: "NEW",
 	}
 

@@ -12,8 +12,8 @@ const (
 )
 
 type Order struct {
-	Id         int64
-	UserId     int64
+	ID         int64
+	UserID     int64
 	Status     OrderStatus
 	Number     string
 	Accural    float64

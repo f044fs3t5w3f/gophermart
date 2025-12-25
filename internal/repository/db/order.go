@@ -13,12 +13,12 @@ func (d *dbRepository) CreateOrder(ctx context.Context, order *models.Order) err
 		VALUES ($1, $2, $3)
 		ON CONFLICT (number) DO NOTHING
 		RETURNING id`,
-		order.UserId, order.Number, order.Status)
+		order.UserID, order.Number, order.Status)
 	err := result.Err()
 	if err != nil {
 		return err
 	}
-	err = result.Scan(&order.Id)
+	err = result.Scan(&order.ID)
 	return err
 }
 
@@ -32,7 +32,7 @@ func (d *dbRepository) GetOrderByNumber(ctx context.Context, number string) (*mo
 		return nil, err
 	}
 	order := &models.Order{}
-	err = row.Scan(&order.Id, &order.UserId, &order.Number, &order.Status)
+	err = row.Scan(&order.ID, &order.UserID, &order.Number, &order.Status)
 	// TODO: /multiplier
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -57,7 +57,7 @@ func (d *dbRepository) GetOrdersByUserId(ctx context.Context, userId int64) ([]*
 		rows.Scan()
 		order := &models.Order{}
 		var accural int32
-		err = rows.Scan(&order.Id, &order.UserId, &order.Number, &order.Status, &order.UploadedAt, &accural)
+		err = rows.Scan(&order.ID, &order.UserID, &order.Number, &order.Status, &order.UploadedAt, &accural)
 		order.Accural = float64(accural) / multiplier
 		if err != nil {
 			return nil, err
@@ -81,7 +81,7 @@ func (d *dbRepository) ListOrdersForUpdate(ctx context.Context) ([]*models.Order
 		rows.Scan()
 		order := &models.Order{}
 		var accural int32
-		err = rows.Scan(&order.Id, &order.UserId, &order.Number, &order.Status, &order.UploadedAt, &accural)
+		err = rows.Scan(&order.ID, &order.UserID, &order.Number, &order.Status, &order.UploadedAt, &accural)
 		order.Accural = float64(accural) / multiplier
 		if err != nil {
 			return nil, err

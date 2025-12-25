@@ -13,6 +13,6 @@ func (s *Service) ListWithdraws(ctx context.Context) ([]*models.Withdraw, error)
 	if !ok {
 		return nil, ErrInternalError
 	}
-	withdraws, err := s.repo.GetWithdrawsByUserId(ctx, user.Id)
+	withdraws, err := s.repo.GetWithdrawsByUserId(ctx, user.ID)
 	return withdraws, err
 }

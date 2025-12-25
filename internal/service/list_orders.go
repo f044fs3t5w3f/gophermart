@@ -13,6 +13,6 @@ func (s *Service) ListOrders(ctx context.Context) ([]*models.Order, error) {
 	if !ok {
 		return nil, ErrInternalError
 	}
-	orders, err := s.repo.GetOrdersByUserId(ctx, user.Id)
+	orders, err := s.repo.GetOrdersByUserId(ctx, user.ID)
 	return orders, err
 }
