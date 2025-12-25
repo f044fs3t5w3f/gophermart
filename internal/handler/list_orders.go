@@ -15,12 +15,15 @@ func listOrders(s *service.Service) http.HandlerFunc {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
+		if len(orders) == 0 {
+			http.Error(w, "[]", http.StatusNoContent)
+		}
 		ordersResponse := make([]orderResponse, 0, len(orders))
 		for _, order := range orders {
 			ordersResponse = append(ordersResponse, orderResponse{
 				Number:     order.Number,
-				Status:     order.Status,
-				Accrual:    9000, // TODO: calculate accrual
+				Status:     string(order.Status),
+				Accrual:    order.Accural,
 				UploadedAt: order.UploadedAt.Format(time.RFC3339),
 			})
 		}

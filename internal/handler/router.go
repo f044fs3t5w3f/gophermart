@@ -19,6 +19,10 @@ func GetRouter(s *service.Service, repo repository.Repository) *chi.Mux {
 	authRequiredRoutes.Use(authMiddleware)
 	authRequiredRoutes.Post("/api/user/orders", addOrder(s))
 	authRequiredRoutes.Get("/api/user/orders", listOrders(s))
+	authRequiredRoutes.Get("/api/user/balance", balance(s))
+	authRequiredRoutes.Post("/api/user/balance/withdraw", addWithdraw(s))
+	authRequiredRoutes.Get("/api/user/withdrawals", ListWithdraws(s))
+
 	r.Mount("/", authRequiredRoutes)
 	return r
 }

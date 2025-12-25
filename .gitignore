@@ -24,3 +24,4 @@ vendor/
 
 db.sh
 env.list
+test_accrual_service.txt

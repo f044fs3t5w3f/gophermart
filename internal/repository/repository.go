@@ -2,21 +2,43 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"github.com/f044fs3t5w3f/gophermart/internal/models"
 )
 
-type Repository interface {
-	CreateUser(context.Context, *models.User) error
-	GetUserById(context.Context, int64) (*models.User, error)
-	GetUserByLogin(context.Context, string) (*models.User, error)
-	DoesUserExist(context.Context, string) (bool, error)
+var (
+	ErrNotEnough                            = errors.New("not enough")
+	ErrWithdrawAllreadyExists               = errors.New("withdraw allready exists")
+	ErrWithdrawAllreadyExistsForAnotherUser = errors.New("withdraw allready exists for another user")
+)
 
-	CreateSession(ctx context.Context, session *models.Session) error
+type UserRepository interface {
+	CreateUser(ctx context.Context, user *models.User) error
+	GetUserByLogin(ctx context.Context, login string) (*models.User, error)
+	DoesUserExist(ctx context.Context, login string) (bool, error)
 	GetUserByToken(ctx context.Context, token string) (*models.User, error)
+	GetBalanceByUserId(ctx context.Context, userId int64) (float64, float64, error)
+}
 
-	GetOrderByNumber(ctx context.Context, number string) (*models.Order, error)
+type SessionRepository interface {
+	CreateSession(ctx context.Context, session *models.Session) error
+}
+
+type OrderRepository interface {
 	CreateOrder(ctx context.Context, order *models.Order) error
+	GetOrderByNumber(ctx context.Context, number string) (*models.Order, error)
+	GetOrdersByUserId(ctx context.Context, userID int64) ([]*models.Order, error)
+}
 
-	GetOrdersByUserId(ctx context.Context, userId int64) ([]*models.Order, error)
+type WithdrawRepository interface {
+	CreateWithdraw(ctx context.Context, order *models.Withdraw) error
+	GetWithdrawsByUserId(ctx context.Context, userId int64) ([]*models.Withdraw, error)
+}
+
+type Repository interface {
+	UserRepository
+	SessionRepository
+	OrderRepository
+	WithdrawRepository
 }

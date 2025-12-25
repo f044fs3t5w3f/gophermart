@@ -3,7 +3,7 @@ CREATE TABLE orders(
     user_id integer,
     number varchar(40),
     status varchar(12),
-    uploaded_at TIMESTAMPT NOT NULL DEFAULT now(),
+    uploaded_at TIMESTAMP NOT NULL DEFAULT now(),
     PRIMARY KEY(id)
 );
 

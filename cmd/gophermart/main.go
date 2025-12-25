@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"net/http"
 
+	"github.com/f044fs3t5w3f/gophermart/internal/accrual"
 	"github.com/f044fs3t5w3f/gophermart/internal/handler"
 	"github.com/f044fs3t5w3f/gophermart/internal/logger"
 	dbRepo "github.com/f044fs3t5w3f/gophermart/internal/repository/db"
@@ -30,7 +32,9 @@ func main() {
 	}
 
 	repository := dbRepo.NewDBRepository(db)
-	service := service.NewService(repository)
+	accrualService := accrual.NewAccuralService(context.Background(), repository, logger.Log, config.accrualSystemAddress)
+	accrualService.LoadOld()
+	service := service.NewService(repository, accrualService)
 	router := handler.GetRouter(service, repository)
 	logger.Log.Info("Server has been started", zap.String("addr", config.runAddress))
 	err = http.ListenAndServe(config.runAddress, router)
