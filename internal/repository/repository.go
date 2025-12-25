@@ -18,7 +18,7 @@ type UserRepository interface {
 	GetUserByLogin(ctx context.Context, login string) (*models.User, error)
 	DoesUserExist(ctx context.Context, login string) (bool, error)
 	GetUserByToken(ctx context.Context, token string) (*models.User, error)
-	GetBalanceByUserId(ctx context.Context, userId int64) (float64, float64, error)
+	GetBalanceByUserID(ctx context.Context, userID int64) (float64, float64, error)
 }
 
 type SessionRepository interface {
@@ -33,7 +33,7 @@ type OrderRepository interface {
 
 type WithdrawRepository interface {
 	CreateWithdraw(ctx context.Context, order *models.Withdraw) error
-	GetWithdrawsByUserID(ctx context.Context, userId int64) ([]*models.Withdraw, error)
+	GetWithdrawsByUserID(ctx context.Context, userID int64) ([]*models.Withdraw, error)
 }
 
 type Repository interface {

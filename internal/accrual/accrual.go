@@ -22,12 +22,12 @@ import (
 type repo interface {
 	// transactionable
 	ListOrdersForUpdate(ctx context.Context) ([]*models.Order, error)
-	UpdateOrderStatus(ctx context.Context, orderId int64, status models.OrderStatus) error
-	UpdateOrderStatusAndAccrual(ctx context.Context, orderId int64, status models.OrderStatus, accrual float64) error
+	UpdateOrderStatus(ctx context.Context, orderID int64, status models.OrderStatus) error
+	UpdateOrderStatusAndAccrual(ctx context.Context, orderID int64, status models.OrderStatus, accrual float64) error
 }
 
 type accrualClient interface {
-	GetInfo(ctx context.Context, orderId string) (*client.AccrualServiceResponse, error)
+	GetInfo(ctx context.Context, orderID string) (*client.AccrualServiceResponse, error)
 }
 
 func NewAccuralService(ctx context.Context, repo repo, log *zap.Logger, accrualServiceURL string) *AccuralService {

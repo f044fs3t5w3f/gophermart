@@ -82,14 +82,19 @@ func (d *dbRepository) CreateWithdraw(ctx context.Context, withdraw *models.With
 	return err
 }
 
-func (d *dbRepository) GetWithdrawsByUserID(ctx context.Context, userId int64) ([]*models.Withdraw, error) {
+func (d *dbRepository) GetWithdrawsByUserID(ctx context.Context, userID int64) ([]*models.Withdraw, error) {
 	rows, err := d.db.QueryContext(ctx, `
 	SELECT id, user_id, order_, processed_at, sum
 	FROM withdraws 
 	WHERE user_id = $1
-	ORDER BY id DESC`, userId)
+	ORDER BY id DESC`, userID)
 	if err != nil {
 		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		if err != sql.ErrNoRows {
+			return nil, nil
+		}
 	}
 	withdraws := []*models.Withdraw{}
 	for rows.Next() {

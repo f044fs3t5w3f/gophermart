@@ -43,12 +43,12 @@ func (d *dbRepository) GetOrderByNumber(ctx context.Context, number string) (*mo
 	return order, nil
 }
 
-func (d *dbRepository) GetOrdersByUserID(ctx context.Context, userId int64) ([]*models.Order, error) {
+func (d *dbRepository) GetOrdersByUserID(ctx context.Context, userID int64) ([]*models.Order, error) {
 	rows, err := d.db.QueryContext(ctx, `
 	SELECT id, user_id, number, status, uploaded_at, accrual
 	FROM orders 
 	WHERE user_id = $1
-	ORDER BY id DESC`, userId)
+	ORDER BY id DESC`, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -107,16 +107,16 @@ func (d *dbRepository) ListOrdersForUpdate(ctx context.Context) ([]*models.Order
 	return orders, nil
 }
 
-func (d *dbRepository) UpdateOrderStatus(ctx context.Context, orderId int64, status models.OrderStatus) error {
+func (d *dbRepository) UpdateOrderStatus(ctx context.Context, orderID int64, status models.OrderStatus) error {
 	result := d.db.QueryRowContext(ctx, `
 		UPDATE orders
 		SET status = $1
 		WHERE id = $2`,
-		status, orderId)
+		status, orderID)
 	return result.Err()
 }
 
-func (d *dbRepository) UpdateOrderStatusAndAccrual(ctx context.Context, orderId int64, status models.OrderStatus, accrual float64) error {
+func (d *dbRepository) UpdateOrderStatusAndAccrual(ctx context.Context, orderID int64, status models.OrderStatus, accrual float64) error {
 	accrualInt := int(accrual * multiplier)
 	tx, err := d.db.BeginTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelSerializable,
@@ -129,7 +129,7 @@ func (d *dbRepository) UpdateOrderStatusAndAccrual(ctx context.Context, orderId 
 		UPDATE orders
 		SET status = $1, accrual = $2
 		WHERE id = $3`,
-		status, accrualInt, orderId)
+		status, accrualInt, orderID)
 	if err = result.Err(); err != nil {
 		return err
 	}
@@ -138,7 +138,7 @@ func (d *dbRepository) UpdateOrderStatusAndAccrual(ctx context.Context, orderId 
 	err = tx.QueryRowContext(ctx, `
 		SELECT user_id 
 		FROM orders 
-		WHERE id = $1`, orderId).Scan(&userId)
+		WHERE id = $1`, orderID).Scan(&userId)
 
 	if err != nil {
 		return err

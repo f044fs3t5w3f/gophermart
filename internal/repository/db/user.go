@@ -69,12 +69,12 @@ func (d *dbRepository) GetUserByToken(ctx context.Context, token string) (*model
 	return user, nil
 }
 
-func (d *dbRepository) GetBalanceByUserId(ctx context.Context, userId int64) (float64, float64, error) {
+func (d *dbRepository) GetBalanceByUserID(ctx context.Context, userID int64) (float64, float64, error) {
 	row := d.db.QueryRowContext(ctx, `
 	SELECT accruals, withdraws 
 	FROM users
 	WHERE id = $1
-`, userId)
+`, userID)
 	var accrualsInt, withdrawsInt int64
 	err := row.Scan(&accrualsInt, &withdrawsInt)
 	return float64(accrualsInt) / multiplier, float64(withdrawsInt) / multiplier, err
