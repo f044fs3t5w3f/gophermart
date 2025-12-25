@@ -28,12 +28,12 @@ type SessionRepository interface {
 type OrderRepository interface {
 	CreateOrder(ctx context.Context, order *models.Order) error
 	GetOrderByNumber(ctx context.Context, number string) (*models.Order, error)
-	GetOrdersByUserId(ctx context.Context, userID int64) ([]*models.Order, error)
+	GetOrdersByUserID(ctx context.Context, userID int64) ([]*models.Order, error)
 }
 
 type WithdrawRepository interface {
 	CreateWithdraw(ctx context.Context, order *models.Withdraw) error
-	GetWithdrawsByUserId(ctx context.Context, userId int64) ([]*models.Withdraw, error)
+	GetWithdrawsByUserID(ctx context.Context, userId int64) ([]*models.Withdraw, error)
 }
 
 type Repository interface {

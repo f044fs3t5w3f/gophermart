@@ -43,7 +43,7 @@ func (d *dbRepository) GetOrderByNumber(ctx context.Context, number string) (*mo
 	return order, nil
 }
 
-func (d *dbRepository) GetOrdersByUserId(ctx context.Context, userId int64) ([]*models.Order, error) {
+func (d *dbRepository) GetOrdersByUserID(ctx context.Context, userId int64) ([]*models.Order, error) {
 	rows, err := d.db.QueryContext(ctx, `
 	SELECT id, user_id, number, status, uploaded_at, accrual
 	FROM orders 

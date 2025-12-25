@@ -24,7 +24,7 @@ func (d *dbRepository) CreateWithdraw(ctx context.Context, withdraw *models.With
 	FROM users
 	WHERE id = $1
 	FOR UPDATE
-`, withdraw.UserId)
+`, withdraw.UserID)
 	var balance int64
 	err = row.Scan(&balance)
 	if err != nil {
@@ -42,7 +42,7 @@ func (d *dbRepository) CreateWithdraw(ctx context.Context, withdraw *models.With
 	var userId int64
 	err = row.Scan(&userId)
 	if err != sql.ErrNoRows {
-		if userId == withdraw.UserId {
+		if userId == withdraw.UserID {
 			return repository.ErrWithdrawAllreadyExists
 		} else {
 			return repository.ErrWithdrawAllreadyExistsForAnotherUser
@@ -57,12 +57,12 @@ func (d *dbRepository) CreateWithdraw(ctx context.Context, withdraw *models.With
 		VALUES ($1, $2, $3)
 		ON CONFLICT (order_) DO NOTHING
 		RETURNING id`,
-		withdraw.UserId, withdraw.Order, sum)
+		withdraw.UserID, withdraw.Order, sum)
 	err = result.Err()
 	if err != nil {
 		return err
 	}
-	err = result.Scan(&withdraw.Id)
+	err = result.Scan(&withdraw.ID)
 	if err != nil {
 		return err
 	}
@@ -82,7 +82,7 @@ func (d *dbRepository) CreateWithdraw(ctx context.Context, withdraw *models.With
 	return err
 }
 
-func (d *dbRepository) GetWithdrawsByUserId(ctx context.Context, userId int64) ([]*models.Withdraw, error) {
+func (d *dbRepository) GetWithdrawsByUserID(ctx context.Context, userId int64) ([]*models.Withdraw, error) {
 	rows, err := d.db.QueryContext(ctx, `
 	SELECT id, user_id, order_, processed_at, sum
 	FROM withdraws 
@@ -96,7 +96,7 @@ func (d *dbRepository) GetWithdrawsByUserId(ctx context.Context, userId int64) (
 		rows.Scan()
 		withdraw := &models.Withdraw{}
 		var sum int64
-		err = rows.Scan(&withdraw.Id, &withdraw.UserId, &withdraw.Order, &withdraw.ProcessedAt, &sum)
+		err = rows.Scan(&withdraw.ID, &withdraw.UserID, &withdraw.Order, &withdraw.ProcessedAt, &sum)
 		withdraw.Sum = float64(sum) / multiplier
 		if err != nil {
 			return nil, err

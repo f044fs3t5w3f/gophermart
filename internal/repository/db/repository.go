@@ -38,7 +38,7 @@ func (d *dbRepository) CreateSession(ctx context.Context, session *models.Sessio
 		INSERT INTO sessions (user_id, token)
 		VALUES ($1, $2)
 		ON CONFLICT (token) DO NOTHING`,
-		session.UserId, session.Token)
+		session.UserID, session.Token)
 	return err
 }
 

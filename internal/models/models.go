@@ -8,5 +8,5 @@ type User struct {
 
 type Session struct {
 	Token  string
-	UserId int64
+	UserID int64
 }
