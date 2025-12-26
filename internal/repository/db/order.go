@@ -134,11 +134,11 @@ func (d *dbRepository) UpdateOrderStatusAndAccrual(ctx context.Context, orderID 
 		return err
 	}
 
-	var userId int64
+	var userID int64
 	err = tx.QueryRowContext(ctx, `
 		SELECT user_id 
 		FROM orders 
-		WHERE id = $1`, orderID).Scan(&userId)
+		WHERE id = $1`, orderID).Scan(&userID)
 
 	if err != nil {
 		return err
@@ -147,14 +147,14 @@ func (d *dbRepository) UpdateOrderStatusAndAccrual(ctx context.Context, orderID 
 	err = tx.QueryRowContext(ctx, `
 		SELECT SUM(accrual) 
 		FROM orders 
-		WHERE user_id = $1 AND status = $2`, userId, models.OrderStatusProcessed).Scan(&accruals)
+		WHERE user_id = $1 AND status = $2`, userID, models.OrderStatusProcessed).Scan(&accruals)
 	if err != nil {
 		return err
 	}
 	_, err = tx.ExecContext(ctx, `UPDATE users
 	SET accruals = $1
 	WHERE id = $2
-	`, accruals, userId)
+	`, accruals, userID)
 	if err != nil {
 		return err
 	}
