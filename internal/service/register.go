@@ -6,17 +6,17 @@ import (
 	"github.com/f044fs3t5w3f/gophermart/internal/models"
 )
 
-func (s *Service) Register(ctx context.Context, login, password string) error {
+func (s *Service) Register(ctx context.Context, login, password string) (string, error) {
 	passwordHash, err := getPasswordHash(password)
 	if err != nil {
-		return err
+		return "", err
 	}
 	userExists, err := s.repo.DoesUserExist(ctx, login)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if userExists {
-		return ErrUserExists
+		return "", ErrUserExists
 	}
 	user := &models.User{
 		Login:        login,
@@ -24,8 +24,22 @@ func (s *Service) Register(ctx context.Context, login, password string) error {
 	}
 	err = s.repo.CreateUser(ctx, user)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return err
+	token, err := generateToken()
+	if err != nil {
+		return "", ErrInternalError
+	}
+
+	session := &models.Session{
+		UserID: user.ID,
+		Token:  token,
+	}
+	err = s.repo.CreateSession(ctx, session)
+	if err != nil {
+		return "", ErrInternalError
+	}
+
+	return token, nil
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/f044fs3t5w3f/gophermart/internal/auth"
 	"github.com/f044fs3t5w3f/gophermart/internal/service"
 )
 
@@ -24,8 +25,15 @@ func register(s *service.Service) http.HandlerFunc {
 			return
 		}
 
-		err = s.Register(r.Context(), registerRequest.Login, registerRequest.Password)
-
+		token, err := s.Register(r.Context(), registerRequest.Login, registerRequest.Password)
+		if err == nil {
+			http.SetCookie(w, &http.Cookie{
+				Name:  auth.TokenCookieName,
+				Value: token,
+				Path:  "/",
+			})
+			return
+		}
 		if errors.Is(err, service.ErrUserExists) {
 			http.Error(w, "User exists", http.StatusConflict)
 		} else if err != nil {
