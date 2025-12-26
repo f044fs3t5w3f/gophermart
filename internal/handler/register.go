@@ -36,7 +36,7 @@ func register(s *service.Service) http.HandlerFunc {
 		}
 		if errors.Is(err, service.ErrUserExists) {
 			http.Error(w, "User exists", http.StatusConflict)
-		} else if err != nil {
+		} else {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 		}
 	}

@@ -28,6 +28,7 @@ func listOrders(s *service.Service) http.HandlerFunc {
 			})
 		}
 		jsonEncoder := json.NewEncoder(w)
+		w.Header().Set("Content-Type", "application/json")
 		err = jsonEncoder.Encode(ordersResponse)
 		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)

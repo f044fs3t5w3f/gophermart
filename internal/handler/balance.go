@@ -23,6 +23,7 @@ func balance(s *service.Service) http.HandlerFunc {
 			Current:   current,
 			Withdrawn: withdrawn,
 		}
+		w.Header().Set("Content-Type", "application/json")
 		err = json.NewEncoder(w).Encode(&response)
 		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
