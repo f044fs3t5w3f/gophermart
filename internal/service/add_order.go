@@ -41,6 +41,7 @@ func (s *Service) AddOrder(ctx context.Context, token, orderNumber string) (bool
 	if err != nil {
 		return false, ErrInternalError
 	}
+	s.accrualService.AddToFetchList(order)
 
 	return true, nil
 }
