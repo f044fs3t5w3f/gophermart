@@ -41,15 +41,17 @@ func (d *dbRepository) CreateWithdraw(ctx context.Context, withdraw *models.With
 	`, withdraw.Order)
 	var userID int64
 	err = row.Scan(&userID)
-	if err != sql.ErrNoRows {
+
+	if err != nil {
+		if err != sql.ErrNoRows {
+			return err
+		}
+	} else {
 		if userID == withdraw.UserID {
 			return repository.ErrWithdrawAllreadyExists
 		} else {
 			return repository.ErrWithdrawAllreadyExistsForAnotherUser
 		}
-	}
-	if err != nil {
-		return err
 	}
 
 	result := tx.QueryRowContext(ctx, `
@@ -73,7 +75,7 @@ func (d *dbRepository) CreateWithdraw(ctx context.Context, withdraw *models.With
 		WHERE user_id = $1
 	)
 	WHERE id = $2
-	`, userID, userID)
+	`, withdraw.UserID, withdraw.UserID)
 	if err != nil {
 		return err
 	}
