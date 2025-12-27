@@ -2,6 +2,7 @@ package accrual
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/f044fs3t5w3f/gophermart/internal/accrual/client"
@@ -80,7 +81,7 @@ func (p *AccuralService) AddToFetchList(order *models.Order) {
 				p.log.Error("failed to get accrual info", zap.Error(err))
 				continue
 			}
-
+			p.log.Info("Got accural service response", zap.String("accural", fmt.Sprintf("%+v\n", accrual)))
 			if accrual.Order != order.Number {
 				p.log.Error(
 					"Response order number doesn't match request order number",
