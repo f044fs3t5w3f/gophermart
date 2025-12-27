@@ -7,7 +7,7 @@ import (
 	"github.com/f044fs3t5w3f/gophermart/internal/models"
 )
 
-func (s *Service) Balance(ctx context.Context) (current, withdrawn float64, err error) {
+func (s *Service) Balance(ctx context.Context) (float64, float64, error) {
 	usrPtr := ctx.Value(auth.ContextUserKey)
 	user, ok := usrPtr.(*models.User)
 	if !ok {
@@ -17,5 +17,5 @@ func (s *Service) Balance(ctx context.Context) (current, withdrawn float64, err 
 	if err != nil {
 		return 0, 0, nil
 	}
-	return accruals - withdrawn, withdraws, nil
+	return accruals - withdraws, withdraws, nil
 }
