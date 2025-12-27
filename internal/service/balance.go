@@ -14,7 +14,7 @@ func (s *Service) Balance(ctx context.Context) (current, withdrawn float64, err 
 		return 0, 0, ErrInternalError
 	}
 	accruals, withdraws, err := s.repo.GetBalanceByUserID(ctx, user.ID)
-	if err == nil {
+	if err != nil {
 		return 0, 0, nil
 	}
 	return accruals - withdrawn, withdraws, nil

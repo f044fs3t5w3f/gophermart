@@ -101,6 +101,8 @@ func (p *AccuralService) AddToFetchList(order *models.Order) {
 				}
 			case client.StatusProcessed:
 				status := models.OrderStatusProcessed
+
+				p.log.Info("To update order status", zap.String("accural", fmt.Sprintf("%+v\n", accrual)))
 				err := p.repository.UpdateOrderStatusAndAccrual(p.ctx, order.ID, status, accrual.Accrual)
 				if err != nil {
 					p.log.Error("failed to update order status and accrual", zap.String("orderId", order.Number))
