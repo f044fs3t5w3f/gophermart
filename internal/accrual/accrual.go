@@ -32,6 +32,8 @@ type accrualClient interface {
 
 func NewAccuralService(ctx context.Context, repo repo, log *zap.Logger, accrualServiceURL string) *AccuralService {
 	client := client.NewAccrualClient(accrualServiceURL)
+
+	log.Info("Starting accural servuce ", zap.String("url", accrualServiceURL))
 	return &AccuralService{
 		ctx:        ctx,
 		repository: repo,
