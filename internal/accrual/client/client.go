@@ -23,7 +23,7 @@ func (c *client) GetInfo(ctx context.Context, orderID string) (*AccrualServiceRe
 	if err := c.limiter.Wait(ctx); err != nil {
 		return nil, fmt.Errorf("limiter: %w", err)
 	}
-	url := fmt.Sprintf("http://%s/api/orders/%s", c.baseURL, orderID)
+	url := fmt.Sprintf("%s/api/orders/%s", c.baseURL, orderID)
 	response, err := c.client.Get(url)
 	if err != nil {
 		return nil, fmt.Errorf("GetInfo: %w", err)
