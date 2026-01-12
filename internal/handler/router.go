@@ -15,6 +15,9 @@ func GetRouter(s *service.Service, repo repository.Repository) *chi.Mux {
 	r.Post("/api/user/login", login(s))
 
 	authMiddleware := auth.GetAuthMiddleware(repo)
+	// Оставляю зависимость от репозитория, а не сервиса, так как считаю, что именно в middleware
+	// прокладка в виде сервиса -- лишняя
+
 	authRequiredRoutes := chi.NewRouter()
 	authRequiredRoutes.Use(authMiddleware)
 	authRequiredRoutes.Post("/api/user/orders", addOrder(s))

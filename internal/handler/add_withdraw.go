@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/f044fs3t5w3f/gophermart/internal/repository"
 	"github.com/f044fs3t5w3f/gophermart/internal/service"
 )
 
@@ -26,11 +25,11 @@ func addWithdraw(s *service.Service) http.HandlerFunc {
 		}
 
 		err = s.AddWithdraw(r.Context(), addWithdrawRequest.Order, addWithdrawRequest.Sum)
-		if errors.Is(err, repository.ErrWithdrawAllreadyExistsForAnotherUser) {
+		if errors.Is(err, service.ErrWithdrawAllreadyExistsForAnotherUser) {
 			http.Error(w, "Withdraw exists", http.StatusConflict)
-		} else if errors.Is(err, repository.ErrWithdrawAllreadyExists) {
+		} else if errors.Is(err, service.ErrWithdrawAllreadyExists) {
 			return
-		} else if errors.Is(err, repository.ErrNotEnough) {
+		} else if errors.Is(err, service.ErrNotEnough) {
 			http.Error(w, "No enough points", http.StatusPaymentRequired)
 		} else if errors.Is(err, service.ErrInvalidNumber) {
 			http.Error(w, "Invalid number", http.StatusUnprocessableEntity)
