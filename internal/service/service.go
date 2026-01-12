@@ -7,7 +7,7 @@ import (
 
 type accrualService interface {
 	LoadOld()
-	AddToFetchList(order *models.Order)
+	AddToFetchList(order *models.Order) error
 }
 
 type Service struct {

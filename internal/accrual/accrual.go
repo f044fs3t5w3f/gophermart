@@ -2,7 +2,10 @@ package accrual
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/f044fs3t5w3f/gophermart/internal/accrual/client"
@@ -11,14 +14,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// type txKeyType struct{}
-
-// var txKey = txKeyType{}
-
-// type transactionable interface {
-// 	beginTx() *sql.Tx
-// 	commitTx(tx *sql.Tx) error
-// }
+var ErrServiceShuttedDown = errors.New("service is shutted down")
 
 type repo interface {
 	// transactionable
@@ -35,19 +31,27 @@ func NewAccuralService(ctx context.Context, repo repo, log *zap.Logger, accrualS
 	client := client.NewAccrualClient(accrualServiceURL)
 
 	log.Info("Starting accural servuce ", zap.String("url", accrualServiceURL))
-	return &AccuralService{
+	accuralService := &AccuralService{
 		ctx:        ctx,
 		repository: repo,
 		client:     client,
 		log:        log,
+		wg:         &sync.WaitGroup{},
 	}
+	go func() {
+		<-ctx.Done()
+		accuralService.shuttedDown.Store(true)
+	}()
+	return accuralService
 }
 
 type AccuralService struct {
-	ctx        context.Context
-	repository repo
-	client     accrualClient
-	log        *zap.Logger
+	ctx         context.Context
+	repository  repo
+	client      accrualClient
+	log         *zap.Logger
+	wg          *sync.WaitGroup
+	shuttedDown atomic.Bool
 }
 
 func (p *AccuralService) LoadOld() {
@@ -60,10 +64,16 @@ func (p *AccuralService) LoadOld() {
 	}
 }
 
-func (p *AccuralService) AddToFetchList(order *models.Order) {
-	firstAttempt := true
-	sleep := 1 * time.Second
+func (p *AccuralService) AddToFetchList(order *models.Order) error {
+	if p.shuttedDown.Load() {
+		return ErrServiceShuttedDown
+	}
+	p.log.Info("accural service: start to proccess", zap.String("order", order.Number))
+	p.wg.Add(1)
 	go func() {
+		defer p.wg.Done()
+		firstAttempt := true
+		sleep := 1 * time.Second
 		for {
 			select {
 			case <-p.ctx.Done():
@@ -73,8 +83,13 @@ func (p *AccuralService) AddToFetchList(order *models.Order) {
 			if firstAttempt {
 				firstAttempt = false
 			} else {
-				time.Sleep(sleep)
-				sleep = min(sleep*2, 1*time.Hour)
+				timer := time.NewTimer(sleep * time.Second)
+				select {
+				case <-timer.C:
+				case <-p.ctx.Done():
+					return
+				}
+				sleep = min(sleep*2, 300*time.Second)
 			}
 			accrual, err := p.client.GetInfo(p.ctx, order.Number)
 			if err != nil {
@@ -123,4 +138,11 @@ func (p *AccuralService) AddToFetchList(order *models.Order) {
 			}
 		}
 	}()
+	return nil
+}
+
+func (p *AccuralService) Wait() {
+	p.log.Info("accuralService: wait for current responses...")
+	p.wg.Wait()
+	p.log.Info("accuralService: closed")
 }

@@ -3,7 +3,12 @@ package main
 import (
 	"context"
 	"database/sql"
+	"net"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/f044fs3t5w3f/gophermart/internal/accrual"
 	"github.com/f044fs3t5w3f/gophermart/internal/handler"
@@ -32,13 +37,38 @@ func main() {
 	}
 
 	repository := dbRepo.NewDBRepository(db)
-	accrualService := accrual.NewAccuralService(context.Background(), repository, logger.Log, config.accrualSystemAddress)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
+
+	accrualService := accrual.NewAccuralService(ctx, repository, logger.Log, config.accrualSystemAddress)
 	accrualService.LoadOld()
 	service := service.NewService(repository, accrualService)
 	router := handler.GetRouter(service, repository)
-	logger.Log.Info("Server has been started", zap.String("addr", config.runAddress))
-	err = http.ListenAndServe(config.runAddress, router)
-	if err != nil {
-		logger.Log.Fatal("couldn't start server", zap.Error(err))
+	srv := &http.Server{
+		Addr:    config.runAddress,
+		Handler: router,
+		BaseContext: func(l net.Listener) context.Context {
+			return ctx
+		},
 	}
+
+	go func() {
+		logger.Log.Info("Starting http server", zap.String("addr", config.runAddress))
+		err = srv.ListenAndServe()
+
+		if err != nil {
+			logger.Log.Fatal("couldn't start server", zap.Error(err))
+		}
+
+	}()
+
+	sig := <-signals
+	logger.Log.Info("shutting down", zap.String("signal", sig.String()))
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer shutdownCancel()
+	srv.Shutdown(shutdownCtx)
+	accrualService.Wait()
 }
